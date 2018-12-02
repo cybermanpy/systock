@@ -1,0 +1,784 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: departamentos; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE departamentos (
+    pkdpto integer NOT NULL,
+    dep_descrip character varying(140),
+    fkdir integer NOT NULL
+);
+
+
+ALTER TABLE public.departamentos OWNER TO postgres;
+
+--
+-- Name: desinsumos; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE desinsumos (
+    pkdesinsumo integer NOT NULL,
+    desinsumo character varying(140),
+    fktipo integer NOT NULL,
+    fkrubro integer NOT NULL
+);
+
+
+ALTER TABLE public.desinsumos OWNER TO postgres;
+
+--
+-- Name: detalle_entregas; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE detalle_entregas (
+    pkdetent integer NOT NULL,
+    fkinsumoapro integer NOT NULL,
+    fkentrega integer NOT NULL,
+    cantdetalle integer NOT NULL
+);
+
+
+ALTER TABLE public.detalle_entregas OWNER TO postgres;
+
+--
+-- Name: detalle_solicitudes; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE detalle_solicitudes (
+    pkdet integer NOT NULL,
+    fksol integer NOT NULL,
+    fkinsumo integer NOT NULL,
+    can_entregada integer NOT NULL,
+    can_sol integer
+);
+
+
+ALTER TABLE public.detalle_solicitudes OWNER TO postgres;
+
+--
+-- Name: detalles_orden_compra; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE detalles_orden_compra (
+    pkdetordenc integer NOT NULL,
+    fkinsumoapro integer NOT NULL,
+    fkordencom integer NOT NULL,
+    cantordenc integer NOT NULL
+);
+
+
+ALTER TABLE public.detalles_orden_compra OWNER TO postgres;
+
+--
+-- Name: direcciones; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE direcciones (
+    pkdir integer NOT NULL,
+    dir_descrip character varying(140)
+);
+
+
+ALTER TABLE public.direcciones OWNER TO postgres;
+
+--
+-- Name: entregas; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE entregas (
+    pkentrega integer NOT NULL,
+    fechaent date NOT NULL,
+    fkprov integer NOT NULL,
+    desentrega character varying(140),
+    norden integer NOT NULL
+);
+
+
+ALTER TABLE public.entregas OWNER TO postgres;
+
+--
+-- Name: estados; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE estados (
+    pkestado integer NOT NULL,
+    es_descrip character varying(140)
+);
+
+
+ALTER TABLE public.estados OWNER TO postgres;
+
+--
+-- Name: insumos; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE insumos (
+    pkinsumo integer NOT NULL,
+    fkdesinsumo integer NOT NULL,
+    stock integer DEFAULT 0 NOT NULL,
+    stockmin integer NOT NULL,
+    fechainsumo date DEFAULT now(),
+    fkunidad integer NOT NULL
+);
+
+
+ALTER TABLE public.insumos OWNER TO postgres;
+
+--
+-- Name: insumos_aprov; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE insumos_aprov (
+    pkinsumoapro integer NOT NULL,
+    fkdesinsumo integer NOT NULL,
+    fkordenc integer NOT NULL,
+    stock integer DEFAULT 0 NOT NULL,
+    stockmin integer NOT NULL,
+    fechacarga date DEFAULT now() NOT NULL,
+    fkunidad integer NOT NULL
+);
+
+
+ALTER TABLE public.insumos_aprov OWNER TO postgres;
+
+--
+-- Name: orden_compras; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE orden_compras (
+    pkordenc integer NOT NULL,
+    norden integer NOT NULL,
+    fecha date NOT NULL
+);
+
+
+ALTER TABLE public.orden_compras OWNER TO postgres;
+
+--
+-- Name: proveedores; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE proveedores (
+    pkprov integer NOT NULL,
+    prov_nombre character varying(140),
+    prov_telefono character varying(140),
+    prov_direccion character varying(140),
+    prov_correo character varying(140)
+);
+
+
+ALTER TABLE public.proveedores OWNER TO postgres;
+
+--
+-- Name: rubros; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE rubros (
+    pkrubro integer NOT NULL,
+    tip_descrip character varying(140),
+    rubro integer
+);
+
+
+ALTER TABLE public.rubros OWNER TO postgres;
+
+--
+-- Name: solicitudes; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE solicitudes (
+    pksol integer NOT NULL,
+    sol_fecha timestamp without time zone DEFAULT now() NOT NULL,
+    fkestado integer NOT NULL,
+    fkusuario integer NOT NULL
+);
+
+
+ALTER TABLE public.solicitudes OWNER TO postgres;
+
+--
+-- Name: tipos; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE tipos (
+    pktipo integer NOT NULL,
+    destipo character varying(140)
+);
+
+
+ALTER TABLE public.tipos OWNER TO postgres;
+
+--
+-- Name: unidad_medidas; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE unidad_medidas (
+    pkunidad integer NOT NULL,
+    uni_descrip character varying(140)
+);
+
+
+ALTER TABLE public.unidad_medidas OWNER TO postgres;
+
+--
+-- Name: usuarios; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE usuarios (
+    pkusuario integer NOT NULL,
+    usu_nick character varying(30),
+    usu_pass character varying(50),
+    usu_firstname character varying(140),
+    usu_lastname character varying(140),
+    fkdpto integer NOT NULL,
+    usu_nivel integer NOT NULL,
+    email character varying(140)
+);
+
+
+ALTER TABLE public.usuarios OWNER TO postgres;
+
+--
+-- Data for Name: departamentos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY departamentos (pkdpto, dep_descrip, fkdir) FROM stdin;
+3	Arquitectura de Datos	1
+1	Departamento Administrativo	2
+2	Departamento de Informática	1
+\.
+
+
+--
+-- Data for Name: desinsumos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY desinsumos (pkdesinsumo, desinsumo, fktipo, fkrubro) FROM stdin;
+2	Resma de papel	2	2
+1	Boligráfo	1	2
+3	Resma de Papel	4	2
+4	Resma de papel	3	2
+5	Boligráfo	5	2
+\.
+
+
+--
+-- Data for Name: detalle_entregas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY detalle_entregas (pkdetent, fkinsumoapro, fkentrega, cantdetalle) FROM stdin;
+1	1	1	10
+2	2	1	10
+3	5	1	10
+4	7	3	200
+5	1	3	20
+6	1	3	1
+7	5	2	2
+8	2	4	20
+9	3	4	20
+\.
+
+
+--
+-- Data for Name: detalle_solicitudes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY detalle_solicitudes (pkdet, fksol, fkinsumo, can_entregada, can_sol) FROM stdin;
+9	3	2	1	3
+7	3	1	1	3
+8	3	3	1	3
+6	2	1	2	2
+11	4	3	2	2
+10	4	1	2	2
+4	1	5	3	3
+13	5	2	1	2
+12	5	1	1	2
+\.
+
+
+--
+-- Data for Name: detalles_orden_compra; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY detalles_orden_compra (pkdetordenc, fkinsumoapro, fkordencom, cantordenc) FROM stdin;
+1	1	1	100
+2	2	1	100
+3	5	1	100
+4	3	2	100
+5	7	3	200
+6	1	1	20
+7	2	1	20
+8	5	1	20
+9	7	3	10
+10	7	3	1
+11	8	4	50
+12	2	1	10
+\.
+
+
+--
+-- Data for Name: direcciones; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY direcciones (pkdir, dir_descrip) FROM stdin;
+1	Unidad del Sistema de Información Económica Financiera
+2	STAFF-SSEE
+3	Dirección de Integración
+4	Dirección de Política Macro Fiscal
+5	Dirección de Estudios Económicos
+6	Dirección de Sistema de Información Publica
+7	Dirección General de Empresas Públicas
+8	Dirección de Política de Endeudamiento
+\.
+
+
+--
+-- Data for Name: entregas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY entregas (pkentrega, fechaent, fkprov, desentrega, norden) FROM stdin;
+1	2014-03-17	1	Insumos	1
+2	2014-03-18	1	Insumos de oficina	2
+3	2014-03-19	1	Insumos mes de Marzo	3
+4	2014-03-20	1	Insumos de oficina	2
+\.
+
+
+--
+-- Data for Name: estados; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY estados (pkestado, es_descrip) FROM stdin;
+1	Pendiente
+2	Cancelado
+3	En proceso de aprobacion por administrativo
+4	Aprobado y entregado
+\.
+
+
+--
+-- Data for Name: insumos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY insumos (pkinsumo, fkdesinsumo, stock, stockmin, fechainsumo, fkunidad) FROM stdin;
+5	5	200	10	2014-03-18	1
+4	1	20	10	2014-03-14	1
+2	3	10	10	2014-03-14	1
+1	2	29	10	2014-03-14	1
+3	4	28	10	2014-03-14	1
+\.
+
+
+--
+-- Data for Name: insumos_aprov; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY insumos_aprov (pkinsumoapro, fkdesinsumo, fkordenc, stock, stockmin, fechacarga, fkunidad) FROM stdin;
+4	3	2	0	10	2014-03-18	1
+6	5	1	0	10	2014-03-18	1
+1	2	1	89	10	2014-03-14	1
+5	3	1	108	10	2014-03-18	1
+7	5	3	11	10	2014-03-18	1
+8	3	4	50	10	2014-03-20	1
+2	4	1	100	10	2014-03-14	1
+3	1	2	80	10	2014-03-17	1
+\.
+
+
+--
+-- Data for Name: orden_compras; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY orden_compras (pkordenc, norden, fecha) FROM stdin;
+1	195	2014-03-14
+2	196	2014-03-17
+3	197	2014-03-18
+4	198	2014-03-19
+\.
+
+
+--
+-- Data for Name: proveedores; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY proveedores (pkprov, prov_nombre, prov_telefono, prov_direccion, prov_correo) FROM stdin;
+1	Aprovicionamiento Ministerio de Hacienda	564795	Eusebio Ayala	aprovicionamiento@hacienda.gov.py
+\.
+
+
+--
+-- Data for Name: rubros; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY rubros (pkrubro, tip_descrip, rubro) FROM stdin;
+1	Elementos de Limpieza	341
+2	Utiles de Escritorios, Oficina y Enseñaza	342
+3	Utiles y materiales eléctricos	343
+4	Otros bienes de consumo	350
+\.
+
+
+--
+-- Data for Name: solicitudes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY solicitudes (pksol, sol_fecha, fkestado, fkusuario) FROM stdin;
+1	2014-03-19 11:11:20.163	1	4
+4	2014-03-20 07:40:32.632	1	3
+2	2014-03-19 12:04:21.228	1	2
+3	2014-03-19 14:26:17.534	4	5
+5	2014-03-21 07:59:22.204791	3	8
+\.
+
+
+--
+-- Data for Name: tipos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY tipos (pktipo, destipo) FROM stdin;
+1	Bic azul
+2	Tamaño A4
+3	Tamaño Carta
+4	Tamaño Oficio
+5	Boligel Negro
+\.
+
+
+--
+-- Data for Name: unidad_medidas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY unidad_medidas (pkunidad, uni_descrip) FROM stdin;
+1	Unidades
+2	Litros
+3	Metros
+\.
+
+
+--
+-- Data for Name: usuarios; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY usuarios (pkusuario, usu_nick, usu_pass, usu_firstname, usu_lastname, fkdpto, usu_nivel, email) FROM stdin;
+1	admin	81dc9bdb52d04dc20036dbd8313ed055	Super	Administrador	2	1	diego_saldivar@hacienda.gov.py
+9	carnun	81dc9bdb52d04dc20036dbd8313ed055	Carlos	Nuñez	1	4	carlos_nunez@hacienda.gov.py
+2	josbri	81dc9bdb52d04dc20036dbd8313ed055	Jose	Brizuela	1	2	jose_brizuela@hacienda.gov.py
+3	ricsan	81dc9bdb52d04dc20036dbd8313ed055	Ricardo	Sanchez	2	4	ricardo_sanchez@hacienda.gov.py
+4	diesal	81dc9bdb52d04dc20036dbd8313ed055	Diego	Saldívar	2	3	diego_saldivar@hacienda.gov.py
+5	marsal	81dc9bdb52d04dc20036dbd8313ed055	Mario	Salazar	3	4	mario_salazar@hacienda.gov.py
+6	alarol	81dc9bdb52d04dc20036dbd8313ed055	Alan	Rolón	3	3	alan_rolon@hacienda.gov.py
+7	migsal	81dc9bdb52d04dc20036dbd8313ed055	Miguel	Salvioni	1	3	miguel_salvioni@hacienda.gov.py
+8	enrsan	81dc9bdb52d04dc20036dbd8313ed055	Enrique	Santacruz	1	4	enrique_santacruz@hacienda.gov.py
+\.
+
+
+--
+-- Name: departamentos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY departamentos
+    ADD CONSTRAINT departamentos_pkey PRIMARY KEY (pkdpto);
+
+
+--
+-- Name: desinsumos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY desinsumos
+    ADD CONSTRAINT desinsumos_pkey PRIMARY KEY (pkdesinsumo);
+
+
+--
+-- Name: detalle_entregas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY detalle_entregas
+    ADD CONSTRAINT detalle_entregas_pkey PRIMARY KEY (pkdetent);
+
+
+--
+-- Name: detalle_solicitudes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY detalle_solicitudes
+    ADD CONSTRAINT detalle_solicitudes_pkey PRIMARY KEY (pkdet);
+
+
+--
+-- Name: detalles_orden_compra_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY detalles_orden_compra
+    ADD CONSTRAINT detalles_orden_compra_pkey PRIMARY KEY (pkdetordenc);
+
+
+--
+-- Name: direcciones_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY direcciones
+    ADD CONSTRAINT direcciones_pkey PRIMARY KEY (pkdir);
+
+
+--
+-- Name: entregas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY entregas
+    ADD CONSTRAINT entregas_pkey PRIMARY KEY (pkentrega);
+
+
+--
+-- Name: estados_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY estados
+    ADD CONSTRAINT estados_pkey PRIMARY KEY (pkestado);
+
+
+--
+-- Name: insumos_aprov_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY insumos_aprov
+    ADD CONSTRAINT insumos_aprov_pkey PRIMARY KEY (pkinsumoapro);
+
+
+--
+-- Name: insumos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY insumos
+    ADD CONSTRAINT insumos_pkey PRIMARY KEY (pkinsumo);
+
+
+--
+-- Name: orden_compras_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY orden_compras
+    ADD CONSTRAINT orden_compras_pkey PRIMARY KEY (pkordenc);
+
+
+--
+-- Name: proveedores_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY proveedores
+    ADD CONSTRAINT proveedores_pkey PRIMARY KEY (pkprov);
+
+
+--
+-- Name: rubros_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY rubros
+    ADD CONSTRAINT rubros_pkey PRIMARY KEY (pkrubro);
+
+
+--
+-- Name: solicitudes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY solicitudes
+    ADD CONSTRAINT solicitudes_pkey PRIMARY KEY (pksol);
+
+
+--
+-- Name: tipos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY tipos
+    ADD CONSTRAINT tipos_pkey PRIMARY KEY (pktipo);
+
+
+--
+-- Name: unidad_medida_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY unidad_medidas
+    ADD CONSTRAINT unidad_medida_pkey PRIMARY KEY (pkunidad);
+
+
+--
+-- Name: usuarios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY usuarios
+    ADD CONSTRAINT usuarios_pkey PRIMARY KEY (pkusuario);
+
+
+--
+-- Name: departamentos_fkdir_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY departamentos
+    ADD CONSTRAINT departamentos_fkdir_fkey FOREIGN KEY (fkdir) REFERENCES direcciones(pkdir);
+
+
+--
+-- Name: desinsumos_fkrubro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY desinsumos
+    ADD CONSTRAINT desinsumos_fkrubro_fkey FOREIGN KEY (fkrubro) REFERENCES rubros(pkrubro);
+
+
+--
+-- Name: desinsumos_fktipoinsumo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY desinsumos
+    ADD CONSTRAINT desinsumos_fktipoinsumo_fkey FOREIGN KEY (fktipo) REFERENCES tipos(pktipo);
+
+
+--
+-- Name: detalle_entregas_fkentrega_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY detalle_entregas
+    ADD CONSTRAINT detalle_entregas_fkentrega_fkey FOREIGN KEY (fkentrega) REFERENCES entregas(pkentrega);
+
+
+--
+-- Name: detalle_entregas_fkinsumoapro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY detalle_entregas
+    ADD CONSTRAINT detalle_entregas_fkinsumoapro_fkey FOREIGN KEY (fkinsumoapro) REFERENCES insumos_aprov(pkinsumoapro);
+
+
+--
+-- Name: detalle_solicitudes_fkinsumo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY detalle_solicitudes
+    ADD CONSTRAINT detalle_solicitudes_fkinsumo_fkey FOREIGN KEY (fkinsumo) REFERENCES insumos(pkinsumo);
+
+
+--
+-- Name: detalle_solicitudes_fksol_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY detalle_solicitudes
+    ADD CONSTRAINT detalle_solicitudes_fksol_fkey FOREIGN KEY (fksol) REFERENCES solicitudes(pksol);
+
+
+--
+-- Name: detalles_orden_compra_fkinsumoapro_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY detalles_orden_compra
+    ADD CONSTRAINT detalles_orden_compra_fkinsumoapro_fkey FOREIGN KEY (fkinsumoapro) REFERENCES insumos_aprov(pkinsumoapro);
+
+
+--
+-- Name: detalles_orden_compra_fkordencom_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY detalles_orden_compra
+    ADD CONSTRAINT detalles_orden_compra_fkordencom_fkey FOREIGN KEY (fkordencom) REFERENCES orden_compras(pkordenc);
+
+
+--
+-- Name: entregas_fkprov_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY entregas
+    ADD CONSTRAINT entregas_fkprov_fkey FOREIGN KEY (fkprov) REFERENCES proveedores(pkprov);
+
+
+--
+-- Name: insumos_aprov_fkdesinsumo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY insumos_aprov
+    ADD CONSTRAINT insumos_aprov_fkdesinsumo_fkey FOREIGN KEY (fkdesinsumo) REFERENCES desinsumos(pkdesinsumo);
+
+
+--
+-- Name: insumos_aprov_fkordenc_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY insumos_aprov
+    ADD CONSTRAINT insumos_aprov_fkordenc_fkey FOREIGN KEY (fkordenc) REFERENCES orden_compras(pkordenc);
+
+
+--
+-- Name: insumos_aprov_fkunidad_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY insumos_aprov
+    ADD CONSTRAINT insumos_aprov_fkunidad_fkey FOREIGN KEY (fkunidad) REFERENCES unidad_medidas(pkunidad);
+
+
+--
+-- Name: insumos_fkdesinsumo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY insumos
+    ADD CONSTRAINT insumos_fkdesinsumo_fkey FOREIGN KEY (fkdesinsumo) REFERENCES desinsumos(pkdesinsumo);
+
+
+--
+-- Name: insumos_fkunidad_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY insumos
+    ADD CONSTRAINT insumos_fkunidad_fkey FOREIGN KEY (fkunidad) REFERENCES unidad_medidas(pkunidad);
+
+
+--
+-- Name: solicitudes_fkestado_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY solicitudes
+    ADD CONSTRAINT solicitudes_fkestado_fkey FOREIGN KEY (fkestado) REFERENCES estados(pkestado);
+
+
+--
+-- Name: solicitudes_fkusuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY solicitudes
+    ADD CONSTRAINT solicitudes_fkusuario_fkey FOREIGN KEY (fkusuario) REFERENCES usuarios(pkusuario);
+
+
+--
+-- Name: usuarios_fkdpto_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY usuarios
+    ADD CONSTRAINT usuarios_fkdpto_fkey FOREIGN KEY (fkdpto) REFERENCES departamentos(pkdpto);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
